@@ -98,4 +98,103 @@ app_images:
   - cudaCores: 1000
     cudaVersion: '5'
     kind: cuda
-latest_app_image: f9f6d8a2d8f0422789cac7c3178ca32a
+- appImageId: 3e3f2cf230ca4d969c9d60f5575b8d91
+  flavourName: vanilla
+  image:
+    buildAt: '2024-10-29T18:11:49.617131'
+    imageString: jhnnsrs/starmist:0.0.2-vanilla
+  inspection:
+    requirements:
+    - description: An instance of ArkitektNext Lok to authenticate the user
+      key: lok
+      optional: false
+      service: live.arkitekt.lok
+    - description: An instance of ArkitektNext fluss to retrieve graphs from
+      key: fluss
+      optional: false
+      service: live.arkitekt.fluss
+    - description: An instance of ArkitektNext Kabinet to retrieve nodes from
+      key: kabinet
+      optional: false
+      service: live.arkitekt.kabinet
+    - description: An instance of ArkitektNext Lok to authenticate the user
+      key: livekit
+      optional: false
+      service: io.livekit.livekit
+    - description: An instance of ArkitektNext Mikro to make requests to the user's
+        data
+      key: mikro
+      optional: true
+      service: live.arkitekt.mikro
+    - description: An instance of ArkitektNext Datalayer to make requests to the user's
+        data
+      key: datalayer
+      optional: true
+      service: live.arkitekt.s3
+    - description: An instance of ArkitektNext Rekuest to assign to nodes
+      key: rekuest
+      optional: false
+      service: live.arkitekt.rekuest
+    - description: An instance of ArkitektNext Lok to authenticate the user
+      key: unlok
+      optional: false
+      service: live.arkitekt.lok
+    size: 8393587260
+    templates:
+    - definition:
+        args:
+        - assignWidget:
+            kind: SEARCH
+            query: "query SearchImages($search: String, $values: [ID!]) {\n  options:\
+              \ images(\n    filters: {name: {contains: $search}, ids: $values}\n\
+              \    pagination: {limit: 10}\n  ) {\n    value: id\n    label: name\n\
+              \  }\n}"
+            ward: mikro
+          description: The Input Image.
+          identifier: '@mikro/image'
+          key: image
+          kind: STRUCTURE
+          label: image
+          nullable: false
+          scope: GLOBAL
+        collections:
+        - segmentation
+        - prediction
+        - nuclei
+        description: Segments Cells using the stardist flou2 pretrained model
+        interfaces: []
+        isDev: false
+        isTestFor: []
+        kind: FUNCTION
+        name: Segment Flou2
+        portGroups: []
+        returns:
+        - assignWidget:
+            kind: SEARCH
+            query: "query SearchImages($search: String, $values: [ID!]) {\n  options:\
+              \ images(\n    filters: {name: {contains: $search}, ids: $values}\n\
+              \    pagination: {limit: 10}\n  ) {\n    value: id\n    label: name\n\
+              \  }\n}"
+            ward: mikro
+          description: An Image with the Segmented Cells.
+          identifier: '@mikro/image'
+          key: return0
+          kind: STRUCTURE
+          nullable: false
+          scope: GLOBAL
+        stateful: false
+      dependencies: []
+      dynamic: false
+      interface: predict_flou2
+  manifest:
+    author: jhnnsrs
+    entrypoint: app
+    identifier: starmist
+    scopes:
+    - read
+    version: 0.0.2
+  selectors:
+  - cudaCores: 1000
+    cudaVersion: '5'
+    kind: cuda
+latest_app_image: 3e3f2cf230ca4d969c9d60f5575b8d91

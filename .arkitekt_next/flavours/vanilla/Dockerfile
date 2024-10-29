@@ -8,3 +8,5 @@ RUN pip install "numpy<2"
 RUN mkdir /workspace
 COPY . /workspace
 WORKDIR /workspace
+
+RUN python init.py
