@@ -8,6 +8,9 @@ from mikro_next.api.schema import (
    Image,
    PartialDerivedViewInput,
    PartialPixelViewInput,
+   PartialRGBViewInput,
+   create_rgb_context,
+   ColorMap,
 )
 import numpy as np
 from pydantic import Field
@@ -57,11 +60,15 @@ def predict_flou2(image: Image) -> Image:
     labels, details = model.predict_instances(x)
 
     array = xr.DataArray(labels, dims=list("xy"))
+    
+    print(array.max())
+    
 
     nana = from_array_like(
         array,
         name="Segmented " + image.name,
         derived_views=[PartialDerivedViewInput(originImage=image)],
+        rgb_views=[PartialRGBViewInput(cMin=0, cMax=0, contrastLimitMin=0, contrastLimitMax=array.max(), colorMap=ColorMap.VIRIDIS, baseColor=[0, 0, 0])],
         pixel_views=[PartialPixelViewInput()],
     )
     return nana

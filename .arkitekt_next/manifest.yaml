@@ -3,4 +3,4 @@ entrypoint: app
 identifier: starmist
 scopes:
 - read
-version: 0.0.4
+version: 0.0.5
