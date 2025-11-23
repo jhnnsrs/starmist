@@ -1,7 +1,7 @@
 # Start with the TensorFlow 2.11 GPU image
 FROM tensorflow/tensorflow:2.19.0-gpu
 
-# Install dependencies for Python 3.10
+# Install dependencies for Python 3.11
 RUN apt-get update && \
     apt-get install -y software-properties-common  && \
     apt-get install -y python3.11 python3.11-dev python3.11-venv && \
@@ -24,7 +24,7 @@ RUN python --version && python -c "import tensorflow as tf; print(tf.__version__
 
 
 RUN pip install stardist gputools edt 
-RUN pip install "arkitekt-next[all]==0.8.82"
+RUN pip install "arkitekt-next[all]>=0.33"
 RUN pip install "numpy<2"
 
 RUN mkdir /workspace

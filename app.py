@@ -7,14 +7,13 @@ from mikro_next.api.schema import (
    from_array_like, 
    Image,
    PartialDerivedViewInput,
-   PartialPixelViewInput,
+   PartialInstanceMaskViewInput,
    PartialRGBViewInput,
    create_rgb_context,
+   create_reference_view,
    ColorMap,
 )
 import numpy as np
-from pydantic import Field
-from arkitekt_next.tqdm import tqdm as atdqm
 from arkitekt_next import easy
 from stardist import (
     fill_label_holes,
@@ -33,6 +32,7 @@ from arkitekt_next import register
 from enum import Enum
 from typing import Optional
 from concurrent.futures import ProcessPoolExecutor
+
 
 
 class PreTrainedModels(str, Enum):
@@ -68,8 +68,15 @@ def predict_flou2(image: Image) -> Image:
         array,
         name="Segmented " + image.name,
         derived_views=[PartialDerivedViewInput(originImage=image)],
-        rgb_views=[PartialRGBViewInput(cMin=0, cMax=0, contrastLimitMin=0, contrastLimitMax=array.max(), colorMap=ColorMap.VIRIDIS, baseColor=[0, 0, 0])],
-        pixel_views=[PartialPixelViewInput()],
+        rgb_views=[PartialRGBViewInput(cMin=0, cMax=0, contrastLimitMin=0, contrastLimitMax=array.max(), colorMap=ColorMap.RAINBOW, baseColor=[0, 0, 0])],
+        instance_mask_views=[PartialInstanceMaskViewInput(
+            referenceView=create_reference_view(image)
+            )],
     )
     return nana
+
+
+
+
+
 
