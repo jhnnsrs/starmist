@@ -38,6 +38,42 @@ from concurrent.futures import ProcessPoolExecutor
 class PreTrainedModels(str, Enum):
     STARDIST_ORGANOID_3D = "stardist3"
     STARDIST_STYLED = "stardist_styled"
+    
+    
+    
+@register(collections=["segmentation", "prediction", "nuclei"])
+def predict_stardist_he(image: Image) -> Image:
+    """Segment HE
+
+    Segments Cells using the stardist he pretrained model
+
+    Args:
+        image (Image): The Input Image (needs to have at least 3 channels).
+    Returns:
+        Image: An Image with the Segmented Cells.
+
+    """
+    model = StarDist2D.from_pretrained("2D_versatile_he")
+    x = image.data.sel(c=slice(0,3), t=0, z=0).transpose(*"xyc").data.compute()
+    x = normalize(x)
+
+    labels, details = model.predict_instances(x)
+
+    array = xr.DataArray(labels, dims=list("xy"))
+    
+    print(array.max())
+    
+
+    nana = from_array_like(
+        array,
+        name="Segmented " + image.name,
+        derived_views=[PartialDerivedViewInput(originImage=image)],
+        rgb_views=[PartialRGBViewInput(cMin=0, cMax=0, contrastLimitMin=0, contrastLimitMax=array.max(), colorMap=ColorMap.RAINBOW, baseColor=[0, 0, 0])],
+        instance_mask_views=[PartialInstanceMaskViewInput(
+            referenceView=create_reference_view(image)
+            )],
+    )
+    return nana
 
 
 

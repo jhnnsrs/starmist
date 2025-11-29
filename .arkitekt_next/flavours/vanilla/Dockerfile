@@ -24,7 +24,7 @@ RUN python --version && python -c "import tensorflow as tf; print(tf.__version__
 
 
 RUN pip install stardist gputools edt 
-RUN pip install "arkitekt-next[all]>=0.33"
+RUN pip install "arkitekt-next[all]>=0.34"
 RUN pip install "numpy<2"
 
 RUN mkdir /workspace
