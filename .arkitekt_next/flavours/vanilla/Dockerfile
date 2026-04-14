@@ -4,11 +4,11 @@ FROM tensorflow/tensorflow:2.19.0-gpu
 # Install dependencies for Python 3.11
 RUN apt-get update && \
     apt-get install -y software-properties-common  && \
-    apt-get install -y python3.11 python3.11-dev python3.11-venv && \
+    apt-get install -y python3.12 python3.12-dev python3.12-venv && \
     apt-get install -y python3-pip
 
-# Set up a virtual environment with Python 3.11
-RUN python3.11 -m venv /opt/venv
+# Set up a virtual environment with Python 3.12
+RUN python3.12 -m venv /opt/venv
 
 # Activate the virtual environment and install TensorFlow for Python 3.10
 RUN /opt/venv/bin/pip install --upgrade pip && \
@@ -24,7 +24,7 @@ RUN python --version && python -c "import tensorflow as tf; print(tf.__version__
 
 
 RUN pip install stardist gputools edt 
-RUN pip install "arkitekt-next[all]>=0.34"
+RUN pip install "arkitekt-next[all]>=0.39.2"
 RUN pip install "numpy<2"
 
 RUN mkdir /workspace
