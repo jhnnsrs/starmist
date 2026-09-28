@@ -1,118 +1,211 @@
-from stardist.models import StarDist3D
-from csbdeep.utils import Path, normalize
-import sys
+"""Starmist: StarDist nucleus segmentation for Arkitekt
+
+Two 2D actions over the pretrained StarDist models, one for fluorescence and one
+for H&E brightfield. Each takes a spec-typed image lens and returns a label image
+that derives from it, so the result lands in the same coordinate space as the
+input.
+
+Run:  arkitekt run dev
+"""
+
+import functools
+from typing import TYPE_CHECKING, Annotated
+
 import numpy as np
+from numpy.typing import NDArray
 import xarray as xr
-from mikro_next.api.schema import (
-   from_array_like, 
-   Image,
-   PartialDerivedViewInput,
-   PartialInstanceMaskViewInput,
-   PartialRGBViewInput,
-   create_rgb_context,
-   create_reference_view,
-   ColorMap,
+
+from arkitekt import App, Description, Task, run
+from mikro import Mikro, mikro_service
+from mikro.api.schema import AxisInput, AxisType, DerivedFromInput, Lens, ValueRelation
+from mikro.arkitekt.specs import (
+    N_TIMEPOINTS,
+    VALUE_KIND,
+    Image,
+    RGBImage,
+    SingleChannelImage,
+    at_most,
+    ensure,
+    exactly,
 )
-import numpy as np
-from arkitekt_next import easy
-from stardist import (
-    fill_label_holes,
-    random_label_cmap,
-    calculate_extents,
-    gputools_available,
+
+if TYPE_CHECKING:
+    from stardist.models import StarDist2D
+
+
+app = App(
+    "starmist",
+    "0.1.0",
+    description="StarDist nucleus segmentation with the pretrained 2D models",
+    author="jhnnsrs",
 )
-from stardist import Rays_GoldenSpiral
-from stardist.models import StarDist2D
-from stardist.matching import matching, matching_dataset
-from stardist.models import Config3D, StarDist3D, StarDistData3D
-from tqdm import tqdm
-import shutil
-import uuid
-from arkitekt_next import register
-from enum import Enum
-from typing import Optional
-from concurrent.futures import ProcessPoolExecutor
+app.service(mikro_service)
+
+COLLECTIONS = ["segmentation", "prediction", "nuclei"]
+
+# Spelled out rather than nesting `Still`: a spec alias used as metadata inside
+# another Annotated is not flattened, so its constraint would silently vanish.
+StillFluorescenceImage = Annotated[SingleChannelImage, *at_most(N_TIMEPOINTS, 1)]
+"""A single-channel plane with at most one timepoint."""
+
+StillRGBImage = Annotated[RGBImage, *at_most(N_TIMEPOINTS, 1)]
+"""An RGB plane with at most one timepoint."""
+
+LabelImage = Annotated[Image, *exactly(VALUE_KIND, "categorical")]
+"""A plane of object ids: what both actions produce."""
 
 
+@functools.lru_cache(maxsize=None)
+def _model(name: str) -> "StarDist2D":
+    """Load a pretrained StarDist2D model once per process.
 
-class PreTrainedModels(str, Enum):
-    STARDIST_ORGANOID_3D = "stardist3"
-    STARDIST_STYLED = "stardist_styled"
-    
-    
-    
-@register(collections=["segmentation", "prediction", "nuclei"])
-def predict_stardist_he(image: Image) -> Image:
-    """Segment HE
-
-    Segments Cells using the stardist he pretrained model
-
-    Args:
-        image (Image): The Input Image (needs to have at least 3 channels).
-    Returns:
-        Image: An Image with the Segmented Cells.
-
+    stardist (and with it TensorFlow) is imported here rather than at module
+    level, so declaring or inspecting the app does not need either.
     """
-    model = StarDist2D.from_pretrained("2D_versatile_he")
-    x = image.data.sel(c=slice(0,3), t=0, z=0).transpose(*"xyc").data.compute()
-    x = normalize(x)
+    from stardist.models import StarDist2D
 
-    labels, details = model.predict_instances(x)
+    return StarDist2D.from_pretrained(name)
 
-    array = xr.DataArray(labels, dims=list("xy"))
-    
-    print(array.max())
-    
 
-    nana = from_array_like(
-        array,
-        name="Segmented " + image.name,
-        derived_views=[PartialDerivedViewInput(originImage=image)],
-        rgb_views=[PartialRGBViewInput(cMin=0, cMax=0, contrastLimitMin=0, contrastLimitMax=array.max(), colorMap=ColorMap.RAINBOW, baseColor=[0, 0, 0])],
-        instance_mask_views=[PartialInstanceMaskViewInput(
-            referenceView=create_reference_view(image)
-            )],
+def _segment(
+    model_name: str,
+    x: NDArray[np.generic],
+    prob_thresh: float | None = None,
+    nms_thresh: float | None = None,
+) -> NDArray[np.int32]:
+    """Normalize a (y, x) or (y, x, c) array and predict its instance labels."""
+    from csbdeep.utils import normalize
+
+    axis_norm = (0, 1)  # per channel for YXC, the whole plane for YX
+    labels, _ = _model(model_name).predict_instances(
+        normalize(x, 1, 99.8, axis=axis_norm),
+        prob_thresh=prob_thresh,
+        nms_thresh=nms_thresh,
     )
-    return nana
+    return labels.astype(np.int32)
 
 
+def _upload_labels(
+    mikro: Mikro,
+    labels: xr.DataArray,
+    name: str,
+    axes: list[AxisInput],
+    derived_from: list[DerivedFromInput],
+) -> Lens:
+    """Upload a label map, stage a scene over it, and hand back a lens on all of it.
 
-@register(collections=["segmentation", "prediction", "nuclei"])
-def predict_flou2(image: Image) -> Image:
-    """Segment Flou2
-
-    Segments Cells using the stardist flou2 pretrained model
-
-    Args:
-        image (Image): The Input Image.
-    Returns:
-        Image: An Image with the Segmented Cells.
-
+    No histogram anchor: a histogram over object ids would offer contrast
+    limits for values that are not intensities.
     """
-    model = StarDist2D.from_pretrained("2D_versatile_fluo")
-    x = image.data.sel(c=0, t=0, z=0).transpose(*"xy").data.compute()
-    x = normalize(x)
-
-    labels, details = model.predict_instances(x)
-
-    array = xr.DataArray(labels, dims=list("xy"))
-    
-    print(array.max())
-    
-
-    nana = from_array_like(
-        array,
-        name="Segmented " + image.name,
-        derived_views=[PartialDerivedViewInput(originImage=image)],
-        rgb_views=[PartialRGBViewInput(cMin=0, cMax=0, contrastLimitMin=0, contrastLimitMax=array.max(), colorMap=ColorMap.RAINBOW, baseColor=[0, 0, 0])],
-        instance_mask_views=[PartialInstanceMaskViewInput(
-            referenceView=create_reference_view(image)
-            )],
+    dataset = mikro.create_array_dataset(
+        data=labels,
+        scales=[],
+        name=name,
+        axes=axes,
+        anchors=[],
+        derived_from=derived_from,
     )
-    return nana
+    if dataset.intrinsic_system is None:
+        raise RuntimeError(f"Uploaded dataset {dataset.id} has no intrinsic system")
+    dataset.intrinsic_system.stage(name="Default")
+    return dataset.lens()
 
 
+def _publish(
+    mikro: Mikro,
+    image: Lens,
+    labels: NDArray[np.int32],
+    space_axes: tuple[str, ...],
+    source_dims: tuple[str, ...],
+) -> Lens:
+    """Upload the labels as a categorical derivation of `image`."""
+    n_objects = int(labels.max())
+    array = xr.DataArray(labels, dims=space_axes)
+    # The labels keep only the space axes. When the image had others (a pinned
+    # channel, a single timepoint), the edge is a rank-dropping projection.
+    if tuple(space_axes) == tuple(source_dims):
+        edge = image.derive_identity(value_relation=ValueRelation.CATEGORIZED)
+    else:
+        edge = image.derive_projection(
+            list(space_axes), value_relation=ValueRelation.CATEGORIZED
+        )
+
+    lens = _upload_labels(
+        mikro,
+        array,
+        f"StarDist segmentation ({n_objects} objects)",
+        image.carried_axes(space_axes),
+        derived_from=[edge],
+    )
+    return ensure(lens, LabelImage, declares={VALUE_KIND: "categorical"})
 
 
+@app.action(name="Segment Fluorescent Nuclei", collections=COLLECTIONS)
+def predict_flou2(
+    image: Annotated[
+        StillFluorescenceImage, Description("The fluorescence image to segment")
+    ],
+    prob_thresh: Annotated[
+        float | None, Description("Probability threshold (model default if unset)")
+    ] = None,
+    nms_thresh: Annotated[
+        float | None, Description("Overlap threshold (model default if unset)")
+    ] = None,
+    *,
+    mikro: Mikro,
+    task: Task,
+) -> LabelImage:
+    """Segments nuclei in a single-channel fluorescence image with the pretrained
+    StarDist 2D_versatile_fluo model.
+    """
+    data = image.data
+    space_axes = image.axes_of_type(AxisType.SPACE)
+    # The spec allows a surviving size-1 channel or time axis: squeeze them.
+    plane = data.squeeze([d for d in data.dims if d not in space_axes])
+
+    task.progress(10, "Reading image")
+    x = np.asarray(plane.transpose(*space_axes).data)
+
+    task.progress(30, "Loading model and predicting")
+    labels = _segment("2D_versatile_fluo", x, prob_thresh, nms_thresh)
+
+    task.progress(80, "Uploading labels")
+    return _publish(mikro, image, labels, space_axes, tuple(str(d) for d in data.dims))
 
 
+@app.action(name="Segment H&E Nuclei", collections=COLLECTIONS)
+def predict_stardist_he(
+    image: Annotated[StillRGBImage, Description("The H&E image to segment")],
+    prob_thresh: Annotated[
+        float | None, Description("Probability threshold (model default if unset)")
+    ] = None,
+    nms_thresh: Annotated[
+        float | None, Description("Overlap threshold (model default if unset)")
+    ] = None,
+    *,
+    mikro: Mikro,
+    task: Task,
+) -> LabelImage:
+    """Segments nuclei in an RGB H&E brightfield image with the pretrained
+    StarDist 2D_versatile_he model.
+    """
+    data = image.data
+    space_axes = image.axes_of_type(AxisType.SPACE)
+    (channel_axis,) = image.axes_of_type(AxisType.CHANNEL)
+    plane = data.squeeze(
+        [d for d in data.dims if d not in space_axes and d != channel_axis]
+    )
+
+    task.progress(10, "Reading image")
+    # StarDist wants YXC
+    x = np.asarray(plane.transpose(*space_axes, channel_axis).data)
+
+    task.progress(30, "Loading model and predicting")
+    labels = _segment("2D_versatile_he", x, prob_thresh, nms_thresh)
+
+    task.progress(80, "Uploading labels")
+    return _publish(mikro, image, labels, space_axes, tuple(str(d) for d in data.dims))
+
+
+if __name__ == "__main__":
+    run(app)

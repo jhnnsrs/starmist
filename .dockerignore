@@ -1,0 +1,9 @@
+# Credentials and local state must not be baked into the image
+.arkitekt_next/
+.arkitekt/cache/
+**/*fakts_cache.json
+.git/
+.venv/
+__pycache__/
+.pytest_cache/
+.modelcache/

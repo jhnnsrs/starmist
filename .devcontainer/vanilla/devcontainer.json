@@ -1,7 +1,7 @@
 {
   "name": "starmist vanilla Devcontainer",
   "build": {
-    "dockerfile": "/home/jhnnsrs/Code/apps/starmist/.arkitekt_next/flavours/vanilla/Dockerfile",
+    "dockerfile": "../../.arkitekt/flavours/vanilla/Dockerfile",
     "context": "../.."
   },
   "runArgs": ["--network=host", "--gpus=all"]
