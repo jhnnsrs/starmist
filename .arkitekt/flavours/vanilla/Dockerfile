@@ -19,7 +19,7 @@ RUN python --version && python -c "import tensorflow as tf; print(tf.__version__
 # StarDist's optional OpenCL acceleration, and its pyopencl fights TF's numpy pin.
 RUN pip install --only-binary=numpy \
     "tensorflow[and-cuda]==2.19.0" stardist edt \
-    "arkitekt[all]>=3.2.0" "mikro>=5.0.0" "numpy<2"
+    "arkitekt[all]>=4.0.1" "mikro>=6.0.0" "numpy<2"
 
 RUN mkdir /app
 WORKDIR /app

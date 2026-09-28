@@ -11,3 +11,6 @@ dockerfile: Dockerfile
 selectors: 
   - kind: cuda
 
+platforms:
+  # The tensorflow GPU base image is published for amd64 only.
+  - linux/amd64

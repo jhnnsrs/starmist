@@ -7,21 +7,13 @@ builds:
     bloks: []
     implementations:
     - definition:
-        allow_probe: null
         args:
-        - children: null
-          choices: null
-          default: null
-          description: The fluorescence image to segment
-          dimension: null
+        - description: The fluorescence image to segment
           effects: []
           identifier: '@mikro/lens'
           key: image
           kind: STRUCTURE
-          label: null
           nullable: false
-          proposed_units: null
-          reference_unit: null
           requires:
           - key: '@mikro/n_space_axes'
             operator: EQUALS
@@ -33,40 +25,18 @@ builds:
             operator: LTE
             value: 1
           validators: []
-          widget: null
-        - children: null
-          choices: null
-          default: null
-          description: Probability threshold (model default if unset)
-          dimension: null
+        - description: Probability threshold (model default if unset)
           effects: []
-          identifier: null
           key: prob_thresh
           kind: FLOAT
-          label: null
           nullable: true
-          proposed_units: null
-          reference_unit: null
-          requires: null
           validators: []
-          widget: null
-        - children: null
-          choices: null
-          default: null
-          description: Overlap threshold (model default if unset)
-          dimension: null
+        - description: Overlap threshold (model default if unset)
           effects: []
-          identifier: null
           key: nms_thresh
           kind: FLOAT
-          label: null
           nullable: true
-          proposed_units: null
-          reference_unit: null
-          requires: null
           validators: []
-          widget: null
-        catalogs: null
         collections:
         - segmentation
         - prediction
@@ -76,26 +46,18 @@ builds:
 
 
           StarDist 2D_versatile_fluo model.'
-        idempotent: null
-        is_dev: false
-        is_test_for: []
+        isDev: false
+        isTestFor: []
         key: predict_flou2
         kind: FUNCTION
         name: Segment Fluorescent Nuclei
-        port_groups: []
-        pure: null
+        portGroups: []
         returns:
-        - children: null
-          choices: null
-          description: null
-          dimension: null
-          effects: []
+        - effects: []
           identifier: '@mikro/lens'
           key: return0
           kind: STRUCTURE
-          label: null
           nullable: false
-          proposed_units: null
           provides:
           - key: '@mikro/n_space_axes'
             operator: EQUALS
@@ -103,37 +65,23 @@ builds:
           - key: '@mikro/value_kind'
             operator: EQUALS
             value: categorical
-          reference_unit: null
-          widget: null
         stateful: false
         version: '1'
       dependencies: []
-      effect: null
-      instance_id: null
       interface: predict_flou2
       locks: []
       manipulates: []
-      needs_token: true
+      needsToken: true
       optimistics: []
-      params: null
-      provenance_audience: null
       tracks: []
     - definition:
-        allow_probe: null
         args:
-        - children: null
-          choices: null
-          default: null
-          description: The H&E image to segment
-          dimension: null
+        - description: The H&E image to segment
           effects: []
           identifier: '@mikro/lens'
           key: image
           kind: STRUCTURE
-          label: null
           nullable: false
-          proposed_units: null
-          reference_unit: null
           requires:
           - key: '@mikro/n_space_axes'
             operator: EQUALS
@@ -148,40 +96,18 @@ builds:
             operator: LTE
             value: 1
           validators: []
-          widget: null
-        - children: null
-          choices: null
-          default: null
-          description: Probability threshold (model default if unset)
-          dimension: null
+        - description: Probability threshold (model default if unset)
           effects: []
-          identifier: null
           key: prob_thresh
           kind: FLOAT
-          label: null
           nullable: true
-          proposed_units: null
-          reference_unit: null
-          requires: null
           validators: []
-          widget: null
-        - children: null
-          choices: null
-          default: null
-          description: Overlap threshold (model default if unset)
-          dimension: null
+        - description: Overlap threshold (model default if unset)
           effects: []
-          identifier: null
           key: nms_thresh
           kind: FLOAT
-          label: null
           nullable: true
-          proposed_units: null
-          reference_unit: null
-          requires: null
           validators: []
-          widget: null
-        catalogs: null
         collections:
         - segmentation
         - prediction
@@ -190,26 +116,18 @@ builds:
 
 
           StarDist 2D_versatile_he model.'
-        idempotent: null
-        is_dev: false
-        is_test_for: []
+        isDev: false
+        isTestFor: []
         key: predict_stardist_he
         kind: FUNCTION
         name: Segment H&E Nuclei
-        port_groups: []
-        pure: null
+        portGroups: []
         returns:
-        - children: null
-          choices: null
-          description: null
-          dimension: null
-          effects: []
+        - effects: []
           identifier: '@mikro/lens'
           key: return0
           kind: STRUCTURE
-          label: null
           nullable: false
-          proposed_units: null
           provides:
           - key: '@mikro/n_space_axes'
             operator: EQUALS
@@ -217,20 +135,14 @@ builds:
           - key: '@mikro/value_kind'
             operator: EQUALS
             value: categorical
-          reference_unit: null
-          widget: null
         stateful: false
         version: '1'
       dependencies: []
-      effect: null
-      instance_id: null
       interface: predict_stardist_he
       locks: []
       manipulates: []
-      needs_token: true
+      needsToken: true
       optimistics: []
-      params: null
-      provenance_audience: null
       tracks: []
     locks: []
     requirements:
@@ -260,4 +172,188 @@ builds:
   - linux/amd64
   selectors:
   - kind: cuda
-latest_build_run: c8d06b76-b7e7-4798-a47a-16ba4064b262
+- build_id: 8c114125-ae5e-4c4e-9cf0-743102f591d1
+  build_run: 5800156f-2ca9-409c-9f52-fa96a6ed166e
+  description: This is a vanilla flavour
+  flavour: vanilla
+  inspection:
+    bloks: []
+    description: StarDist nucleus segmentation with the pretrained 2D models
+    implementations:
+    - definition:
+        allowProbe: false
+        args:
+        - description: The fluorescence image to segment
+          effects: []
+          identifier: '@mikro/lens'
+          key: image
+          kind: STRUCTURE
+          nullable: false
+          requires:
+          - key: '@mikro/n_space_axes'
+            operator: EQUALS
+            value: 2
+          - key: '@mikro/n_channels'
+            operator: LTE
+            value: 1
+          - key: '@mikro/n_timepoints'
+            operator: LTE
+            value: 1
+          validators: []
+        - description: Probability threshold (model default if unset)
+          effects: []
+          key: prob_thresh
+          kind: FLOAT
+          nullable: true
+          validators: []
+        - description: Overlap threshold (model default if unset)
+          effects: []
+          key: nms_thresh
+          kind: FLOAT
+          nullable: true
+          validators: []
+        catalogs: []
+        collections:
+        - segmentation
+        - prediction
+        - nuclei
+        description: 'Segments nuclei in a single-channel fluorescence image with
+          the pretrained
+
+
+          StarDist 2D_versatile_fluo model.'
+        idempotent: false
+        isDev: false
+        isTestFor: []
+        key: predict_flou2
+        kind: FUNCTION
+        name: Segment Fluorescent Nuclei
+        portGroups: []
+        pure: false
+        returns:
+        - effects: []
+          identifier: '@mikro/lens'
+          key: return0
+          kind: STRUCTURE
+          nullable: false
+          provides:
+          - key: '@mikro/n_space_axes'
+            operator: EQUALS
+            value: 2
+          - key: '@mikro/value_kind'
+            operator: EQUALS
+            value: categorical
+        stateful: false
+        version: '1'
+      dependencies: []
+      effect: NONE
+      interface: predict_flou2
+      locks: []
+      manipulates: []
+      needsToken: true
+      optimistics: []
+      tracks: []
+    - definition:
+        allowProbe: false
+        args:
+        - description: The H&E image to segment
+          effects: []
+          identifier: '@mikro/lens'
+          key: image
+          kind: STRUCTURE
+          nullable: false
+          requires:
+          - key: '@mikro/n_space_axes'
+            operator: EQUALS
+            value: 2
+          - key: '@mikro/n_channel_axes'
+            operator: EQUALS
+            value: 1
+          - key: '@mikro/n_channels'
+            operator: EQUALS
+            value: 3
+          - key: '@mikro/n_timepoints'
+            operator: LTE
+            value: 1
+          validators: []
+        - description: Probability threshold (model default if unset)
+          effects: []
+          key: prob_thresh
+          kind: FLOAT
+          nullable: true
+          validators: []
+        - description: Overlap threshold (model default if unset)
+          effects: []
+          key: nms_thresh
+          kind: FLOAT
+          nullable: true
+          validators: []
+        catalogs: []
+        collections:
+        - segmentation
+        - prediction
+        - nuclei
+        description: 'Segments nuclei in an RGB H&E brightfield image with the pretrained
+
+
+          StarDist 2D_versatile_he model.'
+        idempotent: false
+        isDev: false
+        isTestFor: []
+        key: predict_stardist_he
+        kind: FUNCTION
+        name: Segment H&E Nuclei
+        portGroups: []
+        pure: false
+        returns:
+        - effects: []
+          identifier: '@mikro/lens'
+          key: return0
+          kind: STRUCTURE
+          nullable: false
+          provides:
+          - key: '@mikro/n_space_axes'
+            operator: EQUALS
+            value: 2
+          - key: '@mikro/value_kind'
+            operator: EQUALS
+            value: categorical
+        stateful: false
+        version: '1'
+      dependencies: []
+      effect: NONE
+      interface: predict_stardist_he
+      locks: []
+      manipulates: []
+      needsToken: true
+      optimistics: []
+      tracks: []
+    locks: []
+    requirements:
+    - description: Where the user's images and their metadata live
+      key: mikro
+      optional: false
+      service: live.arkitekt.mikro
+    - description: Where this app's actions are offered and assigned
+      key: rekuest
+      optional: false
+      service: live.arkitekt.rekuest
+    - description: Where the user's files are stored
+      key: s3
+      optional: false
+      service: live.arkitekt.s3
+    size: 16317887287
+    states: []
+  manifest:
+    author: jhnnsrs
+    description: StarDist nucleus segmentation with the pretrained 2D models
+    entrypoint: app
+    identifier: starmist
+    scopes:
+    - openid
+    version: 0.1.0
+  platforms:
+  - linux/amd64
+  selectors:
+  - kind: cuda
+latest_build_run: 5800156f-2ca9-409c-9f52-fa96a6ed166e
