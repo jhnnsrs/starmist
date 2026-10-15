@@ -3,3 +3,5 @@
 *.temp
 cache/
 servers/
+# The runtime journal is local state
+rekuest_journal.db*

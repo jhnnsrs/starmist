@@ -7,3 +7,4 @@
 __pycache__/
 .pytest_cache/
 .modelcache/
+.arkitekt/rekuest_journal.db*
