@@ -91,8 +91,8 @@ def _segmented(cx: float, cy: float, radii: list[float], colour: str, edge: str)
     outline, rays = _star_convex(cx, cy, radii)
     return (
         f'<Path d="{outline}" fill="{colour}" fillOpacity="0.85" stroke="{edge}" strokeWidth="1.4" strokeLinejoin="round" />'
-        f'<Path d="{rays}" stroke="#ffffff" strokeOpacity="0.45" strokeWidth="0.7" />'
-        f'<Circle cx="{cx}" cy="{cy}" r="1.1" fill="#ffffff" fillOpacity="0.8" />'
+        f'<Path d="{rays}" stroke="surface" strokeOpacity="0.45" strokeWidth="0.7" />'
+        f'<Circle cx="{cx}" cy="{cy}" r="1.1" fill="surface" fillOpacity="0.8" />'
     )
 
 
@@ -111,43 +111,42 @@ def _sparkle(cx: float, cy: float, size: float, fill: str, extra: str = "") -> s
 app.blok(
     "starmist_logo",
     f"""
-    <SVG viewBox="0 0 64 64" title="Starmist">
+    <AgentLogo viewBox="0 0 64 64" title="Starmist">
       <Defs>
         <LinearGradient id="ground" x1="0" y1="0" x2="1" y2="1">
-          <Stop offset="0" stopColor="#0f172a" />
-          <Stop offset="1" stopColor="#312e81" />
+          <Stop offset="0" stopColor="ink" />
+          <Stop offset="1" stopColor="spectrum-violet" />
         </LinearGradient>
         <RadialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
-          <Stop offset="0" stopColor="#fde047" stopOpacity="0.45" />
-          <Stop offset="1" stopColor="#fde047" stopOpacity="0" />
+          <Stop offset="0" stopColor="spectrum-yellow" stopOpacity="0.45" />
+          <Stop offset="1" stopColor="spectrum-yellow" stopOpacity="0" />
         </RadialGradient>
         <ClipPath id="tile"><Rect x="0" y="0" width="64" height="64" rx="14" /></ClipPath>
       </Defs>
       <G clipPath="url(#tile)">
         <Rect x="0" y="0" width="64" height="64" fill="url(#ground)" />
-        {_segmented(14, 46, [8, 7.2, 8.4, 7.6, 8.8, 7.4, 8, 7], "#f472b6", "#fbcfe8")}
-        {_segmented(31, 52, [6.8, 7.6, 7, 6.4, 7.2, 7.8, 6.6, 7.2], "#34d399", "#a7f3d0")}
-        {_segmented(21, 29, [6.2, 5.6, 6.6, 6, 5.8, 6.4, 5.6, 6.2], "#38bdf8", "#bae6fd")}
-        <Ellipse cx="49" cy="47" rx="8.5" ry="7.2" fill="#94a3b8" fillOpacity="0.3" stroke="#94a3b8" strokeOpacity="0.5" strokeWidth="1" strokeDasharray="2 2" />
-        <Circle cx="48" cy="46" r="2.6" fill="#94a3b8" fillOpacity="0.35" />
-        {_sparkle(30.5, 20.5, 2.2, "#fef9c3", 'animate="blink"')}
-        {_sparkle(25, 13, 1.6, "#fef9c3", 'animate="blink" animateDelay="0.5"')}
-        {_sparkle(36, 30, 1.4, "#fef9c3", 'animate="blink" animateDelay="1"')}
+        {_segmented(14, 46, [8, 7.2, 8.4, 7.6, 8.8, 7.4, 8, 7], "spectrum-red", "surface")}
+        {_segmented(31, 52, [6.8, 7.6, 7, 6.4, 7.2, 7.8, 6.6, 7.2], "spectrum-green", "surface")}
+        {_segmented(21, 29, [6.2, 5.6, 6.6, 6, 5.8, 6.4, 5.6, 6.2], "spectrum-cyan", "surface")}
+        <Ellipse cx="49" cy="47" rx="8.5" ry="7.2" fill="muted" fillOpacity="0.3" stroke="muted" strokeOpacity="0.5" strokeWidth="1" strokeDasharray="2 2" />
+        <Circle cx="48" cy="46" r="2.6" fill="muted" fillOpacity="0.35" />
+        {_sparkle(30.5, 20.5, 2.2, "spectrum-yellow", 'animate="blink"')}
+        {_sparkle(25, 13, 1.6, "spectrum-yellow", 'animate="blink" animateDelay="0.5"')}
+        {_sparkle(36, 30, 1.4, "spectrum-yellow", 'animate="blink" animateDelay="1"')}
         <G animate="float">
           <Circle cx="45" cy="19" r="15" fill="url(#glow)" />
-          <Path d="{_star(45, 19, 12, 5.6)}" fill="#fde047" stroke="#f59e0b" strokeWidth="1.6" strokeLinejoin="round" />
-          <Circle cx="42" cy="19.5" r="1.3" fill="#1e1b4b" />
-          <Path d="M46.6 19.6q1.4-1.4 2.8 0" fill="none" stroke="#1e1b4b" strokeWidth="1.2" strokeLinecap="round" />
-          <Path d="M42.6 22.6q2.4 2 4.8 0" fill="none" stroke="#1e1b4b" strokeWidth="1.2" strokeLinecap="round" />
-          <Circle cx="40.2" cy="22" r="1.1" fill="#f472b6" fillOpacity="0.6" />
-          <Circle cx="49.8" cy="22" r="1.1" fill="#f472b6" fillOpacity="0.6" />
+          <Path d="{_star(45, 19, 12, 5.6)}" fill="spectrum-yellow" stroke="spectrum-orange" strokeWidth="1.6" strokeLinejoin="round" />
+          <Circle cx="42" cy="19.5" r="1.3" fill="ink" />
+          <Path d="M46.6 19.6q1.4-1.4 2.8 0" fill="none" stroke="ink" strokeWidth="1.2" strokeLinecap="round" />
+          <Path d="M42.6 22.6q2.4 2 4.8 0" fill="none" stroke="ink" strokeWidth="1.2" strokeLinecap="round" />
+          <Circle cx="40.2" cy="22" r="1.1" fill="spectrum-red" fillOpacity="0.6" />
+          <Circle cx="49.8" cy="22" r="1.1" fill="spectrum-red" fillOpacity="0.6" />
         </G>
       </G>
-      <Rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="#a5b4fc" strokeOpacity="0.3" strokeWidth="1" />
-    </SVG>
+      <Rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="spectrum-blue" strokeOpacity="0.3" strokeWidth="1" />
+    </AgentLogo>
     """,
     description="A star flies over a colony of nuclei and segments each one it passes.",
-    context="logo",
     default=True,
 )
 
@@ -175,7 +174,6 @@ def _action_logo(name: str, title: str, body: str) -> str:
         name,
         f'<ActionLogo viewBox="0 0 24 24" title={quoteattr(title)}><G {_PEN}>{body}{_MASCOT}</G></ActionLogo>',
         description=f"{title}.",
-        context="action_logo",
     )
     return name
 
@@ -386,27 +384,26 @@ def predict_stardist_he(
 # ``duration`` seconds. The clip follows whichever action is further along, since a
 # blok expression has no "if" to pick the running one: after one action has finished,
 # a run of the other only shows in the badge until it too is done.
-FLUO = "self.predict_flou2.latest"
-HE = "self.predict_stardist_he.latest"
-PROGRESS = f"utils.math.max(values=[{FLUO}.progress, {HE}.progress])"
+FLUO = "self.tasks.predict_flou2"
+HE = "self.tasks.predict_stardist_he"
+PROGRESS = f"math.max({FLUO}.progress, {HE}.progress)"
 
 app.blok(
     "starmist-3d",
     bsx(f"""
-    <Scene camera="front" grid="false" height="100%">
-      <Model id="star" src="@self.assets.star">
-        <Animate clip="spiral" progress="0" animateTo="@utils.math.divide(a={PROGRESS}, b=100)" duration="4" />
-        <Popout node="star" open="@{FLUO}.running">
-          <Badge text="@{FLUO}.message" />
+    <Scene camera="front" grid={{false}} height="100%">
+      <Model id="star" src={{self.assets.star}}>
+        <Animate clip="spiral" progress={{0}} animateTo={{math.div({PROGRESS}, 100)}} duration={{4}} />
+        <Popout node="star" open={{{FLUO}.running}}>
+          <Badge text={{{FLUO}.message}} />
         </Popout>
-        <Popout node="star" open="@{HE}.running">
-          <Badge text="@{HE}.message" />
+        <Popout node="star" open={{{HE}.running}}>
+          <Badge text={{{HE}.message}} />
         </Popout>
       </Model>
     </Scene>
     """),
     description="The star flies around a colony of cells and segments them as far as the latest segmentation has come.",
-    context="scene",
     default=True,
 )
 
