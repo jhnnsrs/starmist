@@ -5,3 +5,4 @@ cache/
 servers/
 # The runtime journal is local state
 rekuest_journal.db*
+rekuest_state.db*

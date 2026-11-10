@@ -329,7 +329,7 @@ def predict_flou2(
     """Segments nuclei in a single-channel fluorescence image with the pretrained
     StarDist 2D_versatile_fluo model.
     """
-    data = image.data
+    data = image.xarray_data
     space_axes = image.axes_of_type(AxisType.SPACE)
     # The spec allows a surviving size-1 channel or time axis: squeeze them.
     plane = data.squeeze([d for d in data.dims if d not in space_axes])
@@ -360,7 +360,7 @@ def predict_stardist_he(
     """Segments nuclei in an RGB H&E brightfield image with the pretrained
     StarDist 2D_versatile_he model.
     """
-    data = image.data
+    data = image.xarray_data
     space_axes = image.axes_of_type(AxisType.SPACE)
     (channel_axis,) = image.axes_of_type(AxisType.CHANNEL)
     plane = data.squeeze(

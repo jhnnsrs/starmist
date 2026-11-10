@@ -1,5 +1,9 @@
 # Starmist
 
+<!-- arkitekt:badge -->
+[![Open in Arkitekt](https://arkitekt.live/img/badge/open-in-arkitekt.svg)](https://arkitekt.live/deeplink?orkestrator=%2Fdo%2Fv1%2Frepo.install%3Fsource%3Doci%253Aghcr.io%252Fjhnnsrs%252Fstarmist)
+<!-- /arkitekt:badge -->
+
 Starmist is Stardist enabled for the Arkitekt platform. You can check out the original Stardist repository [here](https://github.com/mpicbg-csbd/stardist).
 
 ## Actions
